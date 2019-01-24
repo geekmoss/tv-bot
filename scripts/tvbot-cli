@@ -1,0 +1,72 @@
+#!python
+
+from socketio import Client, AsyncClient
+import click
+import os
+
+
+@click.group()
+def group():
+    pass
+
+
+@click.command()
+@click.option("--port", type=click.INT, default=lambda: int(os.environ.get('TVBOT_PORT', 9600)),
+              help="Port of WebSocket server, default read envar TVBOT_PORT or use `9600`")
+@click.option("--host", default=lambda: os.environ.get('TVBOT_HOST', 'http://localhost'),
+              help="Host of WebSocket server, default read envar TVBOT_HOST or use `http://localhost`")
+def ls(port, host):
+    def callback(x):
+        c.disconnect()
+
+        if not x:
+            click.echo(click.style(" URL list is empty.", fg='red', bold=True))
+            return
+
+        click.echo(" Url list:")
+        for url in x:
+            click.echo(" - " + url)
+            pass
+        pass
+
+    c = Client()
+    c.connect(f"{host}:{port}/")
+    c.emit('ls_return', callback=callback)
+    c.wait()
+    pass
+
+
+@click.command()
+@click.argument('url')
+@click.option("--port", type=click.INT, default=lambda: int(os.environ.get('TVBOT_PORT', 9600)),
+              help="Port of WebSocket server, default read envar TVBOT_PORT or use `9600`")
+@click.option("--host", default=lambda: os.environ.get('TVBOT_HOST', 'http://localhost'),
+              help="Host of WebSocket server, default read envar TVBOT_HOST or use `http://localhost`")
+def put(url, port, host):
+    c = Client()
+    c.connect(f"{host}:{port}/")
+    c.emit('put', data=url, callback=c.disconnect)
+    c.wait()
+    pass
+
+
+@click.command()
+@click.argument('tab_id')
+@click.option("--port", type=click.INT, default=lambda: int(os.environ.get('TVBOT_PORT', 9600)),
+              help="Port of WebSocket server, default read envar TVBOT_PORT or use `9600`")
+@click.option("--host", default=lambda: os.environ.get('TVBOT_HOST', 'http://localhost'),
+              help="Host of WebSocket server, default read envar TVBOT_HOST or use `http://localhost`")
+def rm(tab_id, port, host):
+    c = Client()
+    c.connect(f"{host}:{port}/")
+    c.emit('del', data=tab_id, callback=c.disconnect)
+    c.wait()
+    pass
+
+
+if __name__ == '__main__':
+    group.add_command(ls)
+    group.add_command(put)
+    group.add_command(rm)
+    group()
+    pass

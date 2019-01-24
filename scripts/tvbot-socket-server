@@ -1,0 +1,23 @@
+#!python
+
+from TvBot.Socket import Socket
+from flask import Flask
+from flask_socketio import SocketIO
+import click
+
+
+@click.command()
+@click.option("--host", default="0.0.0.0", help="Host of WebSocket server")
+@click.option("--port", type=click.INT, default=9600, help="Port of WebSocket server")
+@click.option("--debug", is_flag=True)
+def server(host, port, debug):
+    app = Flask(__name__)
+    socketio = SocketIO(app)
+    socketio.on_namespace(Socket('/', debug))
+    socketio.run(app, host=host, port=port)
+    pass
+
+
+if __name__ == '__main__':
+    server()
+    pass

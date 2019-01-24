@@ -1,0 +1,130 @@
+#!python
+
+from socketio import Client, ClientNamespace
+from TvBot.Browser import Browser
+from time import sleep
+import os
+import click
+
+
+@click.command()
+@click.option("--delay", type=click.INT, default=30, help="Speed rotation tab in seconds")
+@click.option("--port", type=click.INT, default=lambda: int(os.environ.get('TVBOT_PORT', 9600)),
+              help="Port of WebSocket server, default read envar TVBOT_PORT or use `9600`")
+@click.option("--host", default=lambda: os.environ.get('TVBOT_HOST', 'http://localhost'),
+              help="Host of WebSocket server, default read envar TVBOT_HOST or use `http://localhost`")
+@click.option("--chromium", is_flag=True, help="Use Chormium instead of Firefox")
+@click.option("--fullscreen", is_flag=True, help="Auto use fullscreen")
+@click.option("--debug", is_flag=True)
+def tv(port, host, delay, debug, chromium, fullscreen):
+    b = None
+    try:
+        if chromium:
+            from selenium.webdriver import Chrome
+            b = Browser(webdriver=Chrome(), debug=debug)
+            pass
+        else:
+            b = Browser(debug=debug)
+            pass
+
+        if fullscreen:
+            b.toggle_fullscreen()
+            pass
+
+        sio = Client()
+        sio.register_namespace(TVSocketClient('/', b, debug))
+        sio.connect(f"{host}:{port}")
+
+        try:
+            while True:
+                b.next_tab()
+                sleep(delay)
+                pass
+            pass
+        except KeyboardInterrupt:
+            sio.disconnect()
+            b.close()
+            pass
+        pass
+    except click.Abort:
+        if b:
+            b.close()
+        pass
+    pass
+
+
+class TVSocketClient(ClientNamespace):
+    def __init__(self, namespace, browser, debug):
+        super().__init__(namespace)
+        self.b: Browser = browser
+        self.tabs = {}
+        self.debug = debug
+        pass
+
+    def on_connect(self):
+        if self.debug:
+            click.echo(click.style("CONNECT", fg="bright_black"))
+            pass
+
+        self.emit('ls')
+        pass
+
+    def on_disconnect(self):
+        if self.debug:
+            click.echo(click.style("DISCONNECT", fg="bright_black"))
+            pass
+        pass
+
+    def on_ls(self, urls):
+        if self.debug:
+            click.echo(click.style("LS"))
+            pass
+        if not self.tabs and urls:
+            click.echo(click.style("ADD, First opening", fg="green"))
+            for u in urls:
+                self.tabs[u] = self.b.open_in_new_tab(u)
+                pass
+            pass
+        else:
+            remove = []
+            add = []
+            for u in urls:
+                if u not in self.tabs:
+                    add.append(u)
+                    pass
+                pass
+
+            for u in self.tabs:
+                if u not in urls:
+                    remove.append(u)
+                    pass
+                pass
+
+            if add and self.debug:
+                click.echo(click.style("ADD", fg="green") + ' ' + click.style(", ".join(add), fg="bright_black"))
+                pass
+
+            if remove and self.debug:
+                click.echo(click.style("DEL", fg="red") + ' ' + click.style(", ".join(remove), fg="bright_black"))
+
+            for r in remove:
+                if len(self.tabs) > 1:
+                    self.b.close_tab(self.tabs[r])
+                    pass
+                else:
+                    self.b.first_tab = True  # Ponechá se poslední tab, ale při nové URL se replace novou url
+                    pass
+                del self.tabs[r]
+                pass
+
+            for a in add:
+                self.tabs[a] = self.b.open_in_new_tab(a)
+                pass
+            pass
+        pass
+    pass
+
+
+if __name__ == '__main__':
+    tv()
+    pass
