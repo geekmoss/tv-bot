@@ -7,7 +7,7 @@ with open("README.md", 'r') as f:
 
 setup(
     name='TvBot',
-    version='1.0.1',
+    version='1.0.2',
     description='TVBot resolves bookmark rotation, through Selenium, for presentation on television.',
     author='Jakub Janeček',
     author_email='jakub.janecek@fw-fw.cz',

@@ -110,5 +110,8 @@ if __name__ == '__main__':
     group.add_command(ls)
     group.add_command(put)
     group.add_command(rm)
+    group.add_command(ntab)
+    group.add_command(ptab)
+    group.add_command(fullscreen)
     group()
     pass
