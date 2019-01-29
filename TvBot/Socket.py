@@ -60,14 +60,23 @@ class Socket(Namespace):
         pass
 
     def on_nextTab(self):
+        if self.debug:
+            echo(f"{style('NEXT TAB', fg='blue')} -> EMIT NEXT TAB, Broadcast=True")
+            pass
         emit('nextTab', broadcast=True)
         pass
 
     def on_prevTab(self):
+        if self.debug:
+            echo(f"{style('PREV TAB', fg='blue')} -> EMIT PREV TAB, Broadcast=True")
+            pass
         emit('prevTab', broadcast=True)
         pass
 
     def on_fullscreen(self):
+        if self.debug:
+            echo(f"{style('FULLSCREEN', fg='blue')} -> EMIT FULLSCREEN, Broadcast=True")
+            pass
         emit('fullscreen', broadcast=True)
         pass
     pass

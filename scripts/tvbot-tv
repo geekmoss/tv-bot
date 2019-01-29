@@ -123,15 +123,18 @@ class TVSocketClient(ClientNamespace):
             pass
         pass
 
-    def on_nextTab(self):
+    def on_nextTab(self, *args):
+        if self.debug:
+            click.echo(click.style("nextTab", fg="blue"))
+            pass
         self.b.next_tab()
         pass
 
-    def on_prevTab(self):
+    def on_prevTab(self, *args, **kwargs):
         self.b.prev_tab()
         pass
 
-    def on_fullscreen(self):
+    def on_fullscreen(self, *args, **kwargs):
         self.b.toggle_fullscreen()
         pass
 
