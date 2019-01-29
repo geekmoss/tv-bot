@@ -64,6 +64,48 @@ def rm(tab_id, port, host):
     pass
 
 
+@click.command()
+@click.option("--port", type=click.INT, default=lambda: int(os.environ.get('TVBOT_PORT', 9600)),
+              help="Port of WebSocket server, default read envar TVBOT_PORT or use `9600`")
+@click.option("--host", default=lambda: os.environ.get('TVBOT_HOST', 'http://localhost'),
+              help="Host of WebSocket server, default read envar TVBOT_HOST or use `http://localhost`")
+def ntab(port, host):
+    """ Next tab on TV """
+    c = Client()
+    c.connect(f"{host}:{port}/")
+    c.emit('nextTab', callback=c.disconnect)
+    c.wait()
+    pass
+
+
+@click.command()
+@click.option("--port", type=click.INT, default=lambda: int(os.environ.get('TVBOT_PORT', 9600)),
+              help="Port of WebSocket server, default read envar TVBOT_PORT or use `9600`")
+@click.option("--host", default=lambda: os.environ.get('TVBOT_HOST', 'http://localhost'),
+              help="Host of WebSocket server, default read envar TVBOT_HOST or use `http://localhost`")
+def ptab(port, host):
+    """ Prev tab on TV """
+    c = Client()
+    c.connect(f"{host}:{port}/")
+    c.emit('prevTab', callback=c.disconnect)
+    c.wait()
+    pass
+
+
+@click.command()
+@click.option("--port", type=click.INT, default=lambda: int(os.environ.get('TVBOT_PORT', 9600)),
+              help="Port of WebSocket server, default read envar TVBOT_PORT or use `9600`")
+@click.option("--host", default=lambda: os.environ.get('TVBOT_HOST', 'http://localhost'),
+              help="Host of WebSocket server, default read envar TVBOT_HOST or use `http://localhost`")
+def fullscreen(port, host):
+    """ Toggle fullscreen on TV """
+    c = Client()
+    c.connect(f"{host}:{port}/")
+    c.emit('fullscreen', callback=c.disconnect)
+    c.wait()
+    pass
+
+
 if __name__ == '__main__':
     group.add_command(ls)
     group.add_command(put)

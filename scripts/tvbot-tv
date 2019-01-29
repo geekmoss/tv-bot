@@ -122,6 +122,19 @@ class TVSocketClient(ClientNamespace):
                 pass
             pass
         pass
+
+    def on_nextTab(self):
+        self.b.next_tab()
+        pass
+
+    def on_prevTab(self):
+        self.b.prev_tab()
+        pass
+
+    def on_fullscreen(self):
+        self.b.toggle_fullscreen()
+        pass
+
     pass
 
 

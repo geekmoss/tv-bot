@@ -56,6 +56,15 @@ class Browser:
 
         return self.f.window_handles[i]
 
+    def prev_tab(self):
+        i = self.f.window_handles.index(self.f.current_window_handle)
+
+        i = (len(self.f.window_handles) - 1) if i == 0 else (i - 1)
+
+        self.f.switch_to.window(self.f.window_handles[i])
+
+        return self.f.window_handles[i]
+
     def switch_to_tab(self, tab_id):
         self.f.switch_to.window(tab_id)
         pass

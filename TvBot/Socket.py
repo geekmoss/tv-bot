@@ -58,4 +58,16 @@ class Socket(Namespace):
 
         emit('ls', self.tabs, broadcast=True)
         pass
+
+    def on_nextTab(self):
+        emit('nextTab', broadcast=True)
+        pass
+
+    def on_prevTab(self):
+        emit('prevTab', broadcast=True)
+        pass
+
+    def on_fullscreen(self):
+        emit('fullscreen', broadcast=True)
+        pass
     pass
